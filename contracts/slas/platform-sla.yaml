@@ -1,0 +1,49 @@
+# Platform — Service Level Agreement
+# Covers: EKS cluster, MSK (Kafka), RDS, Redis, OTEL pipeline.
+# Platform SLA is the floor beneath all service SLAs.
+# A service cannot exceed the availability of the platform it runs on.
+
+service: platform
+version: "1.0"
+last_reviewed: "2026-04-01"
+owner: platform-team
+stakeholder_sign_off: engineering-vp
+
+kubernetes_cluster:
+  availability_target_percent: 99.95
+  node_recovery_rto_minutes: 10
+  # RTO: time from node failure detection to replacement node ready.
+  control_plane_sla: aws_eks_managed
+  # EKS control plane SLA is AWS's responsibility (99.95%). We inherit it.
+
+kafka_msk:
+  availability_target_percent: 99.9
+  max_consumer_lag_ms: 500
+  # Consumer lag exceeding 500ms triggers a warning alert.
+  # Consumer lag exceeding 2000ms triggers a page.
+  replication_factor: 3
+  min_insync_replicas: 2
+
+rds_postgres:
+  availability_target_percent: 99.95
+  multi_az: true
+  failover_rto_minutes: 2
+  # AWS RDS Multi-AZ failover SLA. Patroni for self-managed clusters.
+  backup_retention_days: 35
+  point_in_time_recovery: true
+
+redis_elasticache:
+  availability_target_percent: 99.9
+  # Inventory read cache. Degradation here causes read latency SLA breach, not data loss.
+
+observability_pipeline:
+  max_trace_ingestion_lag_seconds: 30
+  # Traces must be queryable in Tempo within 30 seconds of emission.
+  # Alerts must fire within 2 minutes of threshold breach (evaluation interval).
+  alert_evaluation_interval_seconds: 60
+
+recovery_objectives:
+  rto_hours: 4
+  rpo_minutes: 15
+  # RTO: time to restore full service after a full-platform failure.
+  # RPO: maximum data loss window (driven by RDS backup + event store replication).

@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://chakraview.io/events/StockReserved/v1",
+  "title": "StockReserved",
+  "description": "Published by the Inventory service when stock has been successfully reserved for an order. Consumed by the Orders service to advance the place-order saga.",
+  "version": "1",
+  "type": "object",
+  "required": ["eventId", "eventType", "schemaVersion", "occurredAt", "reservationId", "orderId", "sku", "quantityReserved", "expiresAt"],
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "eventType": {
+      "type": "string",
+      "const": "StockReserved"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reservationId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this reservation. Used in ReleaseStockReservation commands."
+    },
+    "orderId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The Order that triggered this reservation."
+    },
+    "sku": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "The SKU for which stock was reserved."
+    },
+    "quantityReserved": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Quantity successfully reserved. Equal to the requested quantity (partial reservations are not supported)."
+    },
+    "availableAfterReservation": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Stock level available for new reservations immediately after this reservation was applied."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when this reservation expires if the order is not confirmed. Reservation TTL is defined in Inventory service config (default: 15 minutes)."
+    }
+  }
+}

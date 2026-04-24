@@ -1,0 +1,36 @@
+# Customers Service — Service Level Agreement
+# Human-authored. Requires senior engineer + stakeholder sign-off to change.
+
+service: customers
+version: "1.2"
+last_reviewed: "2026-04-01"
+owner: customers-team
+stakeholder_sign_off: platform-vp
+
+availability:
+  target_percent: 99.9
+  window_days: 30
+
+latency:
+  p50_ms: 20
+  p95_ms: 80
+  p99_ms: 300
+  measurement_point: api_gateway
+
+throughput:
+  sustained_rps: 200
+  peak_rps: 500
+
+data_integrity:
+  duplicate_registration_tolerance: 0
+  # Two registrations with the same email must never both succeed.
+  # Enforced by unique constraint + idempotency key at the application layer.
+
+gdpr:
+  deletion_sla_days: 30
+  # Customer data must be purged within 30 calendar days of a deletion request.
+  # Purge must cascade to event store (Orders) and projection (Inventory read model).
+  # This is a legal obligation, not a performance target.
+
+error_budget:
+  monthly_minutes: 43.2

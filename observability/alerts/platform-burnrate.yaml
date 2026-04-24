@@ -1,0 +1,66 @@
+# Platform — Infrastructure Health Alerts
+# Generated from observability/slos/platform-slo.yaml
+# DO NOT EDIT MANUALLY
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: platform-slo-burnrate
+  namespace: chakra-platform
+  labels:
+    service: platform
+    slo: "true"
+    prometheus: kube-prometheus
+spec:
+  groups:
+    - name: platform.kafka.health
+      rules:
+        - alert: KafkaConsumerLagWarning
+          expr: kafka_consumer_group_lag > 500
+          for: 5m
+          labels:
+            severity: ticket
+            service: platform
+          annotations:
+            summary: "Kafka consumer lag > 500ms — approaching consistency SLA threshold"
+            runbook_url: "https://github.com/chakraview/chakraview-enterprise-modernization/blob/main/docs/runbooks/kafka-consumer-lag.md"
+
+        - alert: KafkaConsumerLagCritical
+          expr: kafka_consumer_group_lag > 2000
+          for: 2m
+          labels:
+            severity: page
+            service: platform
+          annotations:
+            summary: "Kafka consumer lag > 2000ms — SLA breach imminent"
+            runbook_url: "https://github.com/chakraview/chakraview-enterprise-modernization/blob/main/docs/runbooks/kafka-consumer-lag.md"
+
+    - name: platform.kubernetes.health
+      rules:
+        - alert: PodCrashLooping
+          expr: rate(kube_pod_container_status_restarts_total{namespace=~"chakra-.*"}[15m]) * 60 > 0
+          for: 5m
+          labels:
+            severity: page
+            service: platform
+          annotations:
+            summary: "Pod {{ $labels.pod }} in {{ $labels.namespace }} is crash-looping"
+
+        - alert: NodeNotReady
+          expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+          for: 2m
+          labels:
+            severity: page
+            service: platform
+          annotations:
+            summary: "Kubernetes node {{ $labels.node }} is NotReady"
+
+        - alert: PVCNearFull
+          expr: |
+            kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes < 0.10
+          for: 5m
+          labels:
+            severity: ticket
+            service: platform
+          annotations:
+            summary: "PVC {{ $labels.persistentvolumeclaim }} is >90% full"

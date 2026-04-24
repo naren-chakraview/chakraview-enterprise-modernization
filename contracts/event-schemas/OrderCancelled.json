@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://chakraview.io/events/OrderCancelled/v1",
+  "title": "OrderCancelled",
+  "description": "Published when an order is cancelled, either by customer request or by saga compensation. Triggers stock release (INV-ORD-009).",
+  "version": "1",
+  "type": "object",
+  "required": ["eventId", "eventType", "schemaVersion", "occurredAt", "orderId", "customerId", "reason", "cancelledBy"],
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "eventType": {
+      "type": "string",
+      "const": "OrderCancelled"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "customerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "customer_requested",
+        "payment_failed",
+        "stock_unavailable",
+        "fraud_detected",
+        "operator_cancelled"
+      ],
+      "description": "Reason for cancellation. Determines compensation behavior downstream."
+    },
+    "cancelledBy": {
+      "type": "string",
+      "enum": ["customer", "system", "operator"],
+      "description": "Who initiated the cancellation. Affects refund eligibility and audit trail."
+    },
+    "compensationRequired": {
+      "type": "boolean",
+      "description": "True if this cancellation was triggered by saga compensation (payment_failed, stock_unavailable). Consumers use this to skip redundant compensation steps.",
+      "default": false
+    },
+    "refundAmountCents": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Amount to refund if payment was already captured. Null if no payment was taken."
+    }
+  }
+}

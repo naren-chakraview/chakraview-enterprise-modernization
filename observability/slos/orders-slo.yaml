@@ -1,0 +1,69 @@
+# Orders Service — SLO Definition
+# Derived from contracts/slas/orders-sla.yaml by tooling/generate-prometheus-rules.py
+# DO NOT EDIT MANUALLY — regenerate by running: python3 tooling/generate-prometheus-rules.py
+
+service: orders
+sla_source: contracts/slas/orders-sla.yaml
+sla_version: "2.1"
+generated_at: "2026-04-01T00:00:00Z"
+
+window:
+  days: 30
+
+availability:
+  target: 0.9995
+  error_budget_minutes: 21.6
+  # Derived: (1 - 0.9995) * 30 * 24 * 60 = 21.6 minutes
+
+  # PromQL: ratio of failed requests to total requests
+  # A "failure" is any 5xx response from the Orders service, measured at the gateway.
+  good_events_query: |
+    sum(rate(orders_requests_total{status_code!~"5.."}[window]))
+  total_events_query: |
+    sum(rate(orders_requests_total[window]))
+
+  burn_rate_alerts:
+    - name: OrdersAvailabilityFastBurn
+      window: 1h
+      burn_rate_factor: 14.4
+      severity: page
+      # At 14.4x burn rate: monthly budget exhausted in 30/14.4 = 2.08 days
+    - name: OrdersAvailabilitySlowBurn
+      window: 6h
+      burn_rate_factor: 6.0
+      severity: ticket
+      # At 6x burn rate: monthly budget exhausted in 30/6 = 5 days
+
+latency:
+  target_p99_ms: 500
+  target_p95_ms: 200
+
+  # PromQL: percentage of requests completing within the p99 target
+  good_events_query: |
+    sum(rate(orders_request_duration_seconds_bucket{le="0.5"}[window]))
+  total_events_query: |
+    sum(rate(orders_request_duration_seconds_count[window]))
+
+  burn_rate_alerts:
+    - name: OrdersLatencyFastBurn
+      window: 1h
+      burn_rate_factor: 14.4
+      severity: page
+    - name: OrdersLatencySlowBurn
+      window: 6h
+      burn_rate_factor: 6.0
+      severity: ticket
+
+saga_compensation:
+  target_max_ms: 5000
+  metric: orders_saga_duration_seconds
+  outcome_label_value: compensation
+
+dashboard:
+  grafana_uid: orders-slo-dashboard
+  panel_ids:
+    availability_compliance: 1
+    error_budget_remaining: 2
+    burn_rate_1h: 3
+    burn_rate_6h: 4
+    latency_p99: 5

@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://chakraview.io/events/CustomerRegistered/v1",
+  "title": "CustomerRegistered",
+  "description": "Published when a new customer account is successfully created. Consumed by Orders (customer validity cache) and downstream analytics.",
+  "version": "1",
+  "type": "object",
+  "required": ["eventId", "eventType", "schemaVersion", "occurredAt", "customerId", "email", "registeredAt"],
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "eventType": {
+      "type": "string",
+      "const": "CustomerRegistered"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "customerId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Stable identifier for the Customer aggregate. Never changes after registration."
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address at time of registration. Unique across all customers (INV-CUS-001). PII — handle per data classification policy."
+    },
+    "registeredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp of the registration event. May differ from occurredAt if there was processing latency."
+    },
+    "marketingConsent": {
+      "type": "boolean",
+      "description": "Whether the customer opted in to marketing communications at registration time.",
+      "default": false
+    },
+    "acquisitionChannel": {
+      "type": "string",
+      "enum": ["organic", "referral", "paid_search", "social", "email", "unknown"],
+      "description": "Channel through which the customer was acquired. Used for analytics; not used in domain logic."
+    }
+  }
+}

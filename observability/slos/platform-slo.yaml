@@ -1,0 +1,33 @@
+# Platform — SLO Definition
+# Derived from contracts/slas/platform-sla.yaml
+# DO NOT EDIT MANUALLY
+
+service: platform
+sla_source: contracts/slas/platform-sla.yaml
+sla_version: "1.0"
+generated_at: "2026-04-01T00:00:00Z"
+
+window:
+  days: 30
+
+availability:
+  target: 0.9995
+  error_budget_minutes: 21.6
+  metric: up{job=~"chakra-.*"}
+  burn_rate_alerts:
+    - name: PlatformAvailabilityFastBurn
+      window: 1h
+      burn_rate_factor: 14.4
+      severity: page
+    - name: PlatformAvailabilitySlowBurn
+      window: 6h
+      burn_rate_factor: 6.0
+      severity: ticket
+
+kafka:
+  consumer_lag_warning_ms: 500
+  consumer_lag_critical_ms: 2000
+  metric: kafka_consumer_group_lag
+
+rds:
+  failover_rto_minutes: 2

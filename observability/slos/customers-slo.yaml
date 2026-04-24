@@ -1,0 +1,40 @@
+# Customers Service — SLO Definition
+# Derived from contracts/slas/customers-sla.yaml
+# DO NOT EDIT MANUALLY — regenerate: python3 tooling/generate-prometheus-rules.py
+
+service: customers
+sla_source: contracts/slas/customers-sla.yaml
+sla_version: "1.2"
+generated_at: "2026-04-01T00:00:00Z"
+
+window:
+  days: 30
+
+availability:
+  target: 0.999
+  error_budget_minutes: 43.2
+  metric: customers_requests_total
+  error_metric: customers_errors_total
+  burn_rate_alerts:
+    - name: CustomersAvailabilityFastBurn
+      window: 1h
+      burn_rate_factor: 14.4
+      severity: page
+    - name: CustomersAvailabilitySlowBurn
+      window: 6h
+      burn_rate_factor: 6.0
+      severity: ticket
+
+latency:
+  target_p99_ms: 300
+  target: 0.999
+  histogram_metric: customers_request_duration_seconds
+  burn_rate_alerts:
+    - name: CustomersLatencyFastBurn
+      window: 1h
+      burn_rate_factor: 14.4
+      severity: page
+    - name: CustomersLatencySlowBurn
+      window: 6h
+      burn_rate_factor: 6.0
+      severity: ticket

@@ -1,0 +1,44 @@
+# Inventory Service — SLO Definition
+# Derived from contracts/slas/inventory-sla.yaml
+# DO NOT EDIT MANUALLY — regenerate: python3 tooling/generate-prometheus-rules.py
+
+service: inventory
+sla_source: contracts/slas/inventory-sla.yaml
+sla_version: "1.4"
+generated_at: "2026-04-01T00:00:00Z"
+
+window:
+  days: 30
+
+availability:
+  target: 0.999
+  error_budget_minutes: 43.2
+  metric: inventory_requests_total
+  error_metric: inventory_errors_total
+  burn_rate_alerts:
+    - name: InventoryAvailabilityFastBurn
+      window: 1h
+      burn_rate_factor: 14.4
+      severity: page
+    - name: InventoryAvailabilitySlowBurn
+      window: 6h
+      burn_rate_factor: 6.0
+      severity: ticket
+
+latency:
+  target_p99_ms: 100
+  target: 0.999
+  histogram_metric: inventory_request_duration_seconds
+  burn_rate_alerts:
+    - name: InventoryLatencyFastBurn
+      window: 1h
+      burn_rate_factor: 14.4
+      severity: page
+    - name: InventoryLatencySlowBurn
+      window: 6h
+      burn_rate_factor: 6.0
+      severity: ticket
+
+consistency:
+  projection_lag_alert_ms: 100
+  metric: inventory_projection_lag_seconds

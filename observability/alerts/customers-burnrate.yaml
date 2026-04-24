@@ -1,0 +1,78 @@
+# Customers Service — SLO Burn Rate Alerts
+# Generated from observability/slos/customers-slo.yaml
+# DO NOT EDIT MANUALLY
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: customers-slo-burnrate
+  namespace: chakra-platform
+  labels:
+    service: customers
+    slo: "true"
+    prometheus: kube-prometheus
+spec:
+  groups:
+    - name: customers.slo.availability.burnrate
+      interval: 60s
+      rules:
+        - alert: CustomersAvailabilityFastBurn
+          expr: |
+            (
+              sum(rate(customers_errors_total[1h]))
+              / sum(rate(customers_requests_total[1h]))
+            ) > (14.4 * 0.001)
+          for: 2m
+          labels:
+            severity: page
+            service: customers
+            slo: availability
+          annotations:
+            summary: "Customers: availability SLO fast burn"
+            runbook_url: "https://github.com/chakraview/chakraview-enterprise-modernization/blob/main/docs/runbooks/sla-breach-response.md"
+
+        - alert: CustomersAvailabilitySlowBurn
+          expr: |
+            (
+              sum(rate(customers_errors_total[6h]))
+              / sum(rate(customers_requests_total[6h]))
+            ) > (6 * 0.001)
+          for: 15m
+          labels:
+            severity: ticket
+            service: customers
+            slo: availability
+          annotations:
+            summary: "Customers: availability SLO slow burn"
+            runbook_url: "https://github.com/chakraview/chakraview-enterprise-modernization/blob/main/docs/runbooks/sla-breach-response.md"
+
+    - name: customers.slo.latency.burnrate
+      interval: 60s
+      rules:
+        - alert: CustomersLatencyFastBurn
+          expr: |
+            (
+              1 - sum(rate(customers_request_duration_seconds_bucket{le="0.3"}[1h]))
+              / sum(rate(customers_request_duration_seconds_count[1h]))
+            ) > (14.4 * 0.001)
+          for: 2m
+          labels:
+            severity: page
+            service: customers
+            slo: latency
+          annotations:
+            summary: "Customers: p99 latency SLO fast burn — >300ms"
+
+        - alert: CustomersLatencySlowBurn
+          expr: |
+            (
+              1 - sum(rate(customers_request_duration_seconds_bucket{le="0.3"}[6h]))
+              / sum(rate(customers_request_duration_seconds_count[6h]))
+            ) > (6 * 0.001)
+          for: 15m
+          labels:
+            severity: ticket
+            service: customers
+            slo: latency
+          annotations:
+            summary: "Customers: p99 latency SLO slow burn"

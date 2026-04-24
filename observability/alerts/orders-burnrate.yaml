@@ -1,0 +1,112 @@
+# Orders Service — SLO Burn Rate Alerts
+# Generated from observability/slos/orders-slo.yaml by tooling/generate-prometheus-rules.py
+# DO NOT EDIT MANUALLY
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: orders-slo-burnrate
+  namespace: chakra-platform
+  labels:
+    service: orders
+    slo: "true"
+    prometheus: kube-prometheus
+spec:
+  groups:
+    - name: orders.slo.availability.burnrate
+      interval: 60s
+      rules:
+        # Fast burn: error budget depleting at 14.4x rate (exhausted in ~2 days)
+        # Page the on-call engineer immediately.
+        - alert: OrdersAvailabilityFastBurn
+          expr: |
+            (
+              1 - (
+                sum(rate(orders_requests_total{status_code!~"5.."}[1h]))
+                /
+                sum(rate(orders_requests_total[1h]))
+              )
+            ) > (14.4 * 0.0005)
+          for: 2m
+          labels:
+            severity: page
+            service: orders
+            slo: availability
+          annotations:
+            summary: "Orders: error budget burning at >14.4x rate (fast burn)"
+            description: "{{ $value | humanizePercentage }} error rate over 1h window. Budget exhausts in ~{{ printf \"%.1f\" (0.9995 | sub 1 | abs | div $value | mul 30) }} days at this rate."
+            runbook_url: "https://github.com/chakraview/chakraview-enterprise-modernization/blob/main/docs/runbooks/sla-breach-response.md"
+            dashboard_url: "https://grafana.chakracommerce.internal/d/orders-slo-dashboard"
+
+        # Slow burn: error budget depleting at 6x rate (exhausted in ~5 days)
+        # Create a ticket; no immediate page.
+        - alert: OrdersAvailabilitySlowBurn
+          expr: |
+            (
+              1 - (
+                sum(rate(orders_requests_total{status_code!~"5.."}[6h]))
+                /
+                sum(rate(orders_requests_total[6h]))
+              )
+            ) > (6 * 0.0005)
+          for: 15m
+          labels:
+            severity: ticket
+            service: orders
+            slo: availability
+          annotations:
+            summary: "Orders: error budget burning at >6x rate (slow burn)"
+            runbook_url: "https://github.com/chakraview/chakraview-enterprise-modernization/blob/main/docs/runbooks/sla-breach-response.md"
+
+    - name: orders.slo.latency.burnrate
+      interval: 60s
+      rules:
+        - alert: OrdersLatencyFastBurn
+          expr: |
+            (
+              1 - (
+                sum(rate(orders_request_duration_seconds_bucket{le="0.5"}[1h]))
+                /
+                sum(rate(orders_request_duration_seconds_count[1h]))
+              )
+            ) > (14.4 * 0.0005)
+          for: 2m
+          labels:
+            severity: page
+            service: orders
+            slo: latency
+          annotations:
+            summary: "Orders: p99 latency SLO fast burn — >500ms tail responses consuming budget"
+            runbook_url: "https://github.com/chakraview/chakraview-enterprise-modernization/blob/main/docs/runbooks/orders-service-degraded.md"
+
+        - alert: OrdersLatencySlowBurn
+          expr: |
+            (
+              1 - (
+                sum(rate(orders_request_duration_seconds_bucket{le="0.5"}[6h]))
+                /
+                sum(rate(orders_request_duration_seconds_count[6h]))
+              )
+            ) > (6 * 0.0005)
+          for: 15m
+          labels:
+            severity: ticket
+            service: orders
+            slo: latency
+          annotations:
+            summary: "Orders: p99 latency SLO slow burn"
+            runbook_url: "https://github.com/chakraview/chakraview-enterprise-modernization/blob/main/docs/runbooks/orders-service-degraded.md"
+
+    - name: orders.saga.health
+      rules:
+        - alert: OrdersSagaCompensationRateHigh
+          expr: |
+            sum(rate(orders_saga_compensation_total[15m])) /
+            sum(rate(orders_placed_total[15m])) > 0.05
+          for: 5m
+          labels:
+            severity: ticket
+            service: orders
+          annotations:
+            summary: "Orders: >5% of sagas triggering compensation (payment failures or stock unavailability)"
+            description: "Compensation rate: {{ $value | humanizePercentage }}. Check Payment Gateway status and Inventory availability."

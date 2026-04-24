@@ -1,0 +1,129 @@
+# Service Manifest — Human-authored source of truth for tooling scripts.
+# Used by: generate-helm-boilerplate.sh, generate-ci-workflow.sh, generate-codeowners.py
+# Add a new service here before running any generation scripts.
+
+services:
+  - name: orders
+    language: typescript
+    port: 3000
+    metrics_port: 9090
+    owner_team: orders-team
+    namespace: chakra-orders
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    hpa:
+      min_replicas: 2
+      max_replicas: 10
+      cpu_target_percent: 70
+    sla_file: contracts/slas/orders-sla.yaml
+    domains:
+      - docs/ddd/orders
+      - contracts/domain-invariants/orders-invariants.md
+      - contracts/event-schemas/OrderPlaced.json
+      - contracts/event-schemas/OrderCancelled.json
+
+  - name: inventory
+    language: typescript
+    port: 3001
+    metrics_port: 9091
+    owner_team: inventory-team
+    namespace: chakra-inventory
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    hpa:
+      min_replicas: 2
+      max_replicas: 20
+      cpu_target_percent: 60
+      # Higher max replicas: inventory reads are the highest throughput path
+    sla_file: contracts/slas/inventory-sla.yaml
+    domains:
+      - docs/ddd/inventory
+      - contracts/domain-invariants/inventory-invariants.md
+      - contracts/event-schemas/StockReserved.json
+
+  - name: customers
+    language: typescript
+    port: 3002
+    metrics_port: 9092
+    owner_team: customers-team
+    namespace: chakra-customers
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "128Mi"
+      limits:
+        cpu: "250m"
+        memory: "256Mi"
+    hpa:
+      min_replicas: 2
+      max_replicas: 5
+    sla_file: contracts/slas/customers-sla.yaml
+    domains:
+      - docs/ddd/customers
+      - contracts/domain-invariants/customers-invariants.md
+      - contracts/event-schemas/CustomerRegistered.json
+
+  - name: api-gateway
+    language: kong
+    port: 8000
+    tls_port: 8443
+    owner_team: platform-team
+    namespace: chakra-platform
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+    hpa:
+      min_replicas: 3
+      max_replicas: 10
+      cpu_target_percent: 60
+
+team_context_map:
+  orders-team:
+    - services/orders
+    - docs/ddd/orders
+    - api/openapi/orders-api-v1.yaml
+    - api/asyncapi/orders-events-v1.yaml
+    - infrastructure/helm/charts/orders-service
+    - contracts/slas/orders-sla.yaml
+    - contracts/domain-invariants/orders-invariants.md
+    - contracts/event-schemas/OrderPlaced.json
+    - contracts/event-schemas/OrderCancelled.json
+  inventory-team:
+    - services/inventory
+    - docs/ddd/inventory
+    - api/openapi/inventory-api-v1.yaml
+    - api/asyncapi/inventory-events-v1.yaml
+    - infrastructure/helm/charts/inventory-service
+    - contracts/slas/inventory-sla.yaml
+    - contracts/domain-invariants/inventory-invariants.md
+    - contracts/event-schemas/StockReserved.json
+  customers-team:
+    - services/customers
+    - docs/ddd/customers
+    - api/openapi/customers-api-v1.yaml
+    - api/asyncapi/customers-events-v1.yaml
+    - infrastructure/helm/charts/customers-service
+    - contracts/slas/customers-sla.yaml
+    - contracts/domain-invariants/customers-invariants.md
+    - contracts/event-schemas/CustomerRegistered.json
+  platform-team:
+    - infrastructure
+    - observability
+    - ai-agents
+    - tooling
+    - contracts/slas/platform-sla.yaml
+    - .github

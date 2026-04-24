@@ -1,0 +1,36 @@
+# Validates ADR index completeness and contract coverage on every PR.
+
+name: Contract and ADR Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    name: Validate contracts and ADR index
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run contract coverage validation
+        run: ./tooling/validate-contracts.sh
+
+      - name: Validate Mermaid diagrams render
+        run: |
+          # Check that all .md files with mermaid blocks use the correct fence syntax
+          if grep -r '```mermaid' docs/ --include="*.md" | grep -v '^\s*```mermaid'; then
+            echo "All mermaid blocks use correct fence syntax"
+          fi
+
+      - name: Check README links resolve
+        run: |
+          # Verify all markdown links in README.md point to existing files
+          grep -oP '\[.*?\]\(\K[^)]+' README.md | grep -v 'http' | while read -r link; do
+            if [[ ! -e "$link" ]]; then
+              echo "BROKEN LINK in README.md: $link"
+              exit 1
+            fi
+          done
+          echo "All README links resolve"

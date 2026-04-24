@@ -1,0 +1,89 @@
+# Inventory Service — SLO Burn Rate Alerts
+# Generated from observability/slos/inventory-slo.yaml
+# DO NOT EDIT MANUALLY
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: inventory-slo-burnrate
+  namespace: chakra-platform
+  labels:
+    service: inventory
+    slo: "true"
+    prometheus: kube-prometheus
+spec:
+  groups:
+    - name: inventory.slo.availability.burnrate
+      interval: 60s
+      rules:
+        - alert: InventoryAvailabilityFastBurn
+          expr: |
+            (
+              sum(rate(inventory_errors_total[1h]))
+              / sum(rate(inventory_requests_total[1h]))
+            ) > (14.4 * 0.001)
+          for: 2m
+          labels:
+            severity: page
+            service: inventory
+            slo: availability
+          annotations:
+            summary: "Inventory: availability SLO fast burn (>14.4x rate)"
+            runbook_url: "https://github.com/chakraview/chakraview-enterprise-modernization/blob/main/docs/runbooks/sla-breach-response.md"
+
+        - alert: InventoryAvailabilitySlowBurn
+          expr: |
+            (
+              sum(rate(inventory_errors_total[6h]))
+              / sum(rate(inventory_requests_total[6h]))
+            ) > (6 * 0.001)
+          for: 15m
+          labels:
+            severity: ticket
+            service: inventory
+            slo: availability
+          annotations:
+            summary: "Inventory: availability SLO slow burn (>6x rate)"
+            runbook_url: "https://github.com/chakraview/chakraview-enterprise-modernization/blob/main/docs/runbooks/sla-breach-response.md"
+
+    - name: inventory.slo.latency.burnrate
+      interval: 60s
+      rules:
+        - alert: InventoryLatencyFastBurn
+          expr: |
+            (
+              1 - sum(rate(inventory_request_duration_seconds_bucket{le="0.1"}[1h]))
+              / sum(rate(inventory_request_duration_seconds_count[1h]))
+            ) > (14.4 * 0.001)
+          for: 2m
+          labels:
+            severity: page
+            service: inventory
+            slo: latency
+          annotations:
+            summary: "Inventory: read latency SLO fast burn — p99 > 100ms"
+
+        - alert: InventoryLatencySlowBurn
+          expr: |
+            (
+              1 - sum(rate(inventory_request_duration_seconds_bucket{le="0.1"}[6h]))
+              / sum(rate(inventory_request_duration_seconds_count[6h]))
+            ) > (6 * 0.001)
+          for: 15m
+          labels:
+            severity: ticket
+            service: inventory
+            slo: latency
+          annotations:
+            summary: "Inventory: read latency SLO slow burn"
+
+    - name: inventory.projection.lag
+      rules:
+        - alert: InventoryProjectionLagHigh
+          expr: inventory_projection_lag_seconds > 0.1
+          for: 2m
+          labels:
+            severity: ticket
+            service: inventory
+          annotations:
+            summary: "Inventory: Redis projection lag > 100ms — consistency SLA breach (see INV-INV-006)"

@@ -1,0 +1,62 @@
+# Orders Service — Service Level Agreement
+# Human-authored. Requires senior engineer + stakeholder sign-off to change.
+# Changes here trigger regeneration of observability/slos/orders-slo.yaml and alerts.
+
+service: orders
+version: "2.1"
+last_reviewed: "2026-04-01"
+owner: orders-team
+stakeholder_sign_off: platform-vp
+
+availability:
+  target_percent: 99.95
+  window_days: 30
+  # 99.95% over 30 days = 21.6 minutes of allowed downtime per month.
+  # Calculated error budget: (1 - 0.9995) * 30 * 24 * 60 = 21.6 minutes
+
+latency:
+  p50_ms: 50
+  p95_ms: 200
+  p99_ms: 500
+  # Measured at the API gateway, not inside the service.
+  # Includes saga coordination overhead (Inventory reservation + Payment call).
+  measurement_point: api_gateway
+
+throughput:
+  sustained_rps: 500
+  peak_rps: 1000
+  # Peak is defined as a 5-minute sustained burst.
+  # Service must meet latency targets at peak throughput.
+
+durability:
+  event_loss_tolerance: 0
+  # Zero tolerance: every OrderPlaced event must be durably stored before the
+  # HTTP response is returned. Outbox pattern enforces this.
+
+saga_compensation:
+  max_compensation_latency_ms: 5000
+  # If a saga step fails, the compensation (e.g., stock release) must complete
+  # within this window. Measured from failure detection to compensation event published.
+
+error_budget:
+  monthly_minutes: 21.6
+  # Derived: (1 - availability.target_percent/100) * 30 * 24 * 60
+  # Used by tooling/generate-prometheus-rules.py to set burn rate thresholds.
+
+dependencies:
+  - service: inventory
+    failure_mode: degraded
+    # If Inventory is unavailable, Orders can still accept order placements
+    # but confirmation will be delayed. SLA clock starts ticking on the
+    # dependency recovery, not on the initial failure.
+  - service: payment_gateway
+    failure_mode: hard_fail
+    # If the Payment Gateway is unavailable, order confirmation fails.
+    # This directly consumes Orders error budget.
+
+exclusions:
+  # These scenarios do not count against the Orders SLA error budget.
+  - scheduled_maintenance_with_48h_notice
+  - payment_gateway_outage_exceeding_30min
+  # Payment gateway outages > 30 min are tracked separately against the
+  # vendor SLA, not against the Orders service SLA.

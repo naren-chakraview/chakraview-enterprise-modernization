@@ -1,0 +1,56 @@
+# Inventory Service — Service Level Agreement
+# Human-authored. Requires senior engineer + stakeholder sign-off to change.
+
+service: inventory
+version: "1.4"
+last_reviewed: "2026-04-01"
+owner: inventory-team
+stakeholder_sign_off: platform-vp
+
+availability:
+  target_percent: 99.9
+  window_days: 30
+  # 99.9% over 30 days = 43.2 minutes of allowed downtime per month.
+  # Lower target than Orders: stock queries degrade gracefully (cached reads persist).
+
+latency:
+  read:
+    p50_ms: 5
+    p95_ms: 20
+    p99_ms: 100
+    # Served from Redis projection. Sub-10ms reads are the design target.
+    measurement_point: service_ingress
+  write:
+    p50_ms: 30
+    p95_ms: 100
+    p99_ms: 300
+    # Write path includes PostgreSQL transaction + Kafka event publish.
+    measurement_point: service_ingress
+
+throughput:
+  read_rps: 5000
+  write_rps: 200
+  # Read-heavy workload (product catalog browsing dominates).
+  # Write throughput is bounded by reservation rate during peak order periods.
+
+reservation_correctness:
+  oversell_tolerance: 0
+  # An oversell (reserving stock that does not exist) is a P0 invariant violation.
+  # This is not a latency SLA — it is a correctness SLA.
+  # Measured by reconciliation job that runs every 5 minutes.
+
+consistency:
+  read_write_lag_ms: 100
+  # Maximum acceptable lag between a write (stock reservation) and
+  # the Redis projection reflecting that reservation.
+  # Driven by Kafka consumer lag target.
+
+error_budget:
+  monthly_minutes: 43.2
+
+dependencies:
+  - service: kafka
+    failure_mode: degraded
+    # If Kafka is unavailable, writes still succeed (PostgreSQL transaction commits).
+    # Read projection stops updating. Read latency SLA is unaffected (Redis still serves).
+    # Consistency SLA (read_write_lag_ms) is breached after Kafka recovery lag.
