@@ -1,0 +1,35 @@
+{{/*
+  DestinationRule: Fulfillment Gateway → in-mesh dependencies
+  For the WMS (out-of-mesh, SOAP/HTTP), circuit breaking is handled in
+  WarehouseClient.ts (ADR-0012 Level 2). This rule covers any in-cluster
+  dependencies the gateway may acquire in the future.
+
+  Thresholds sourced from contracts/slas/fulfillment-sla.yaml circuit_breaker block.
+*/}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: fulfillment-gateway
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: fulfillment-gateway
+    adr: "ADR-0012"
+spec:
+  host: fulfillment-gateway.{{ .Values.namespace }}.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 50
+      http:
+        h2UpgradePolicy: NEVER
+        http1MaxPendingRequests: 100
+        maxRequestsPerConnection: 10
+    outlierDetection:
+      # Trip after 5 consecutive 5xx responses — matches fulfillment-sla.yaml failure_threshold
+      consecutiveGatewayErrors: 5
+      consecutive5xxErrors: 5
+      interval: 30s
+      # Eject for 30s — matches fulfillment-sla.yaml open_duration_seconds
+      baseEjectionTime: 30s
+      maxEjectionPercent: 100
+      minHealthPercent: 0

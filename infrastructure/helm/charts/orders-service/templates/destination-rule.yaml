@@ -1,0 +1,40 @@
+{{/*
+  DestinationRule: Orders Service egress to Payment Gateway
+  The Payment Gateway (Stripe/Adyen) is an external HTTPS endpoint.
+  This rule governs the Istio egress ServiceEntry for that host.
+  For the circuit breaker to apply to external traffic, a matching
+  ServiceEntry must exist (see serviceentry-payment-gateway.yaml).
+
+  Thresholds are intentionally conservative: the place-order saga
+  cannot compensate faster than the circuit breaker opens, so we
+  want the breaker to trip quickly to stop new saga attempts.
+*/}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: orders-payment-gateway
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: orders-service
+    adr: "ADR-0012"
+spec:
+  host: api.stripe.com   # overridden per environment via values-*.yaml
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
+    connectionPool:
+      tcp:
+        maxConnections: 20
+        connectTimeout: 3s
+      http:
+        http1MaxPendingRequests: 50
+        maxRequestsPerConnection: 5
+    outlierDetection:
+      # Tight threshold: payment failures in the saga must trip fast
+      # to prevent stock reservations piling up without corresponding payments
+      consecutiveGatewayErrors: 3
+      consecutive5xxErrors: 3
+      interval: 10s
+      baseEjectionTime: 60s
+      maxEjectionPercent: 100
+      minHealthPercent: 0

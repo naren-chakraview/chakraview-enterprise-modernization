@@ -1,0 +1,74 @@
+service: fulfillment-gateway
+description: >
+  SLA for the Fulfillment Gateway — the Leave-and-Layer proxy between the Kafka
+  event bus and the on-premises Warehouse Management System. This SLA is owned
+  independently of the Orders SLA. A WMS outage that breaches this SLA does not
+  breach the Orders SLA.
+owner_team: platform-team
+review_cycle: quarterly
+
+targets:
+  availability:
+    value: 99.9
+    unit: percent
+    window: 30d
+    error_budget_minutes: 43.2
+    definition: >
+      Ratio of OrderConfirmed events successfully dispatched to the WMS within
+      the retry budget to total OrderConfirmed events received. An event that
+      exhausts retries and lands in the dead-letter topic counts as a failure.
+
+  dispatch_latency:
+    p99_ms: 2000
+    p95_ms: 1000
+    definition: >
+      End-to-end latency from Kafka message receipt to WMS HTTP response (success
+      or final retry failure). Measured as a histogram in the gateway process.
+    note: >
+      The WMS SOAP endpoint has a 1500ms P95 baseline. The gateway adds up to
+      500ms for retry logic and circuit breaker state checks.
+
+  max_fulfillment_lag:
+    value: 60
+    unit: seconds
+    definition: >
+      Maximum Kafka consumer lag (in seconds) before a fulfillment lag alert fires.
+      Consumer lag above this threshold means orders are confirmed but fulfillment
+      instructions have not yet been sent to the WMS.
+
+  retry_budget:
+    max_attempts: 3
+    backoff_base_ms: 1000
+    backoff_multiplier: 2
+    definition: >
+      Maximum retries per event before the event is written to the dead-letter
+      topic (chakra.fulfillment.dlq). Retries use exponential backoff.
+
+  dead_letter_rate:
+    max_per_hour: 5
+    alert_threshold: 1
+    definition: >
+      Number of OrderConfirmed events per hour that exhaust retries and land in
+      the dead-letter topic. A rate above 1 per hour triggers a ticket-priority
+      alert.
+
+circuit_breaker:
+  failure_threshold: 5
+  failure_window_seconds: 30
+  open_duration_seconds: 30
+  half_open_probe_count: 1
+  definition: >
+    The circuit breaker opens when 5 consecutive WMS calls fail within a 30-second
+    window. While open, no WMS calls are made; Kafka consumer continues to run and
+    consumer lag accumulates. After 30 seconds the breaker enters half-open: one
+    probe call determines whether to close or remain open.
+
+dependencies:
+  kafka:
+    topic: chakra.orders.confirmed
+    consumer_group: fulfillment-gateway
+  warehouse_wms:
+    protocol: SOAP/HTTP
+    endpoint_classification: external-legacy
+    sla_owner: vendor
+    vendor_sla_response_ms: 1500

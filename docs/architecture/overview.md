@@ -49,12 +49,30 @@ The Orders service orchestrates a distributed transaction across Inventory and P
 
 If step 2 fails, a compensation event releases the stock reservation. See the [sequence diagram](diagrams/sequence-place-order.md) and [saga compensation diagram](diagrams/sequence-saga-compensation.md).
 
+### Choreography vs. Saga Orchestration
+The system uses both coordination models. **Saga Orchestration** (place-order flow) is used when the distributed transaction must be compensated if a step fails — the Orders service issues commands, waits for outcomes, and triggers compensation on failure. **Choreography** is used when downstream reactions are independent and failure does not require the originating service to act — Orders publishes `OrderConfirmed` and is done. The Fulfillment Gateway, Inventory cache warming, and future analytics consumers all react independently.
+
+The decision rule: if the originating service needs to know the outcome, use orchestration. If it doesn't care, use choreography. See [ADR-0015](../adrs/ADR-0015-choreography-events.md) for the full decision criteria and the [choreography sequence diagram](diagrams/sequence-choreography.md).
+
+### Leave-and-Layer (Fulfillment Gateway)
+The on-premises Warehouse Management System (WMS) is a vendor product that cannot be modified. Rather than attempting a parallel replacement while extracting the Orders bounded context, we apply the Leave-and-Layer pattern: the WMS is left in place, and a **Fulfillment Gateway** service is deployed as a new asynchronous layer between the event bus and the WMS SOAP API.
+
+The gateway subscribes to `OrderConfirmed` events on Kafka and translates them into WMS dispatch requests. The Orders service has no knowledge of the WMS; it publishes a domain event and is done. The WMS is untouched. When a modern Fulfillment service is eventually built, only the Kafka consumer group is transferred — no changes required in Orders, Inventory, or Customers.
+
+This pattern is distinct from Strangler Fig. Strangler Fig routes traffic to a new service, gradually replacing the old one. Leave-and-Layer accepts the old system as a permanent (or long-lived) dependency and adapts to it. See [ADR-0011](../adrs/ADR-0011-leave-and-layer-warehouse.md).
+
 ### SLO-Based Observability
 SLAs defined in `contracts/slas/` are the source of truth. SLO definitions in `observability/slos/` translate them into Prometheus-queryable windows. Alerts use multi-window burn rate (Google SRE model) so on-call is paged proportional to budget consumption velocity, not raw error rate. See the [SLA measurement flow](diagrams/sla-measurement-flow.md).
 
 ---
 
 ## Cross-Cutting Concerns
+
+### Sidecar Pattern
+Cross-cutting infrastructure concerns — mTLS, traffic policy enforcement, and telemetry collection — are handled by two sidecars injected into every pod, not by application code. The **Envoy** sidecar (via Istio) provides mTLS with SPIFFE identities, enforces DestinationRule traffic policies (circuit breaking, connection pool limits), and propagates distributed trace context. The **OTEL Collector** sidecar (via the OTEL Operator) receives OTLP signals from the application SDK and forwards them to the Grafana stack. Service authors write business logic and instrument with the OTEL SDK; they implement no TLS code, no retry logic, and no metrics export configuration. See [ADR-0014](../adrs/ADR-0014-sidecar-mesh.md).
+
+### Bulkhead Isolation
+Failures in one bounded context are prevented from cascading by two isolation layers. **Namespace-level ResourceQuotas** cap the total CPU and memory each context can consume across all its replicas — a Fulfillment Gateway memory leak cannot evict Orders pods. **Connection pool limits** in each service's Istio DestinationRule create per-downstream pool boundaries — a degraded Payment Gateway cannot exhaust the Orders service's shared outbound connection pool. See [ADR-0013](../adrs/ADR-0013-bulkhead-isolation.md).
 
 ### Authentication and Authorization
 Kong handles inbound authentication (JWT validation at the gateway). Service-to-service calls within the cluster use Istio mTLS with SPIFFE identities. No service trusts a caller based on network location alone.

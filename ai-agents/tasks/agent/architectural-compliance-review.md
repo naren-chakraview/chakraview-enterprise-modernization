@@ -66,6 +66,12 @@ The report must:
 | CI pipeline triggers on contract file changes | ADR-0001 |
 | PodSecurity namespace label is "restricted" | Principle 9 |
 | ServiceMonitor present for Prometheus scraping | ADR-0008 |
+| `sidecar.istio.io/inject: "true"` annotation present in every Deployment | ADR-0014 |
+| DestinationRule present for every service with an external HTTP dependency | ADR-0012 |
+| outlierDetection block present in every external-dependency DestinationRule | ADR-0012 |
+| ResourceQuota present in every chakra-* namespace | ADR-0013 |
+| LimitRange present in every chakra-* namespace | ADR-0013 |
+| PeerAuthentication mode is STRICT in every chakra-* namespace | ADR-0014 |
 
 ---
 
@@ -81,6 +87,10 @@ The report must:
 | Zero imports from infrastructure/ in domain layer files | coding-standards.md |
 | Every invariant ID in domain-invariants/*.md has a named test | ADR-0001 |
 | Event sourcing (EventStoreDB) used only in Orders domain | ADR-0006 |
+| Leave-and-layer services import no types from the legacy system they wrap | ADR-0011 |
+| Choreography consumers do not import from producer service directories | ADR-0005, ADR-0015 |
+| Application code contains no TLS handshake or metrics transport code | ADR-0014 |
+| circuit_breaker_state gauge registered in every service with external calls | ADR-0012 |
 | CQRS Redis read model not used as input to write decisions | ADR-0007, INV-INV-006 |
 | No `any` types in domain layer | coding-standards.md |
 | Domain errors are named classes, not generic Error | coding-standards.md |

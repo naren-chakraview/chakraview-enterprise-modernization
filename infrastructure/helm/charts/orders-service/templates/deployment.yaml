@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: orders-service
+    version: {{ .Values.image.tag | quote }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: orders-service
+  template:
+    metadata:
+      labels:
+        app: orders-service
+        version: {{ .Values.image.tag | quote }}
+      annotations:
+        # Sidecar 1: Istio Envoy injection — mTLS, traffic policy, trace propagation (ADR-0014)
+        sidecar.istio.io/inject: "true"
+        # Sidecar 2: OTEL Collector injection — metrics/traces/logs forwarding (ADR-0008, ADR-0014)
+        # Injected automatically by the OTEL Operator when namespace label matches Instrumentation CR.
+        # No application configuration required.
+        instrumentation.opentelemetry.io/inject-nodejs: "true"
+        # Prometheus scrape target for ServiceMonitor (ADR-0008)
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: orders-service  # IRSA-scoped; no wildcard IAM (Principle 9)
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: orders-service
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              name: http
+            - containerPort: 9090
+              name: metrics
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.env }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://localhost:4317"   # OTEL Collector sidecar on localhost
+            - name: OTEL_SERVICE_NAME
+              value: orders-service
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20

@@ -24,3 +24,8 @@ This directory contains all ADRs for the Chakra Commerce modernization. ADRs fol
 | [ADR-0008](ADR-0008-opentelemetry.md) | OpenTelemetry as the Instrumentation Standard | Accepted |
 | [ADR-0009](ADR-0009-helm-gitops.md) | Helm + ArgoCD for GitOps Delivery | Accepted |
 | [ADR-0010](ADR-0010-ai-agent-dev-model.md) | AI Agents as the Implementation Model | Accepted |
+| [ADR-0011](ADR-0011-leave-and-layer-warehouse.md) | Leave-and-Layer Pattern for Warehouse Integration | Accepted |
+| [ADR-0012](ADR-0012-circuit-breaker.md) | Circuit Breaker for External Dependency Calls | Accepted |
+| [ADR-0013](ADR-0013-bulkhead-isolation.md) | Bulkhead Isolation | Accepted |
+| [ADR-0014](ADR-0014-sidecar-mesh.md) | Sidecar Pattern for Cross-Cutting Infrastructure Concerns | Accepted |
+| [ADR-0015](ADR-0015-choreography-events.md) | Choreography for Downstream Event Reactions | Accepted |

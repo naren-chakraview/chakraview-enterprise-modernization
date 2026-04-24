@@ -73,6 +73,34 @@ services:
       - contracts/domain-invariants/customers-invariants.md
       - contracts/event-schemas/CustomerRegistered.json
 
+  - name: fulfillment-gateway
+    language: typescript
+    port: 3003
+    metrics_port: 9093
+    owner_team: platform-team
+    namespace: chakra-fulfillment
+    pattern: leave-and-layer          # proxy to legacy WMS; see ADR-0011
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "128Mi"
+      limits:
+        cpu: "250m"
+        memory: "256Mi"
+    hpa:
+      min_replicas: 2
+      max_replicas: 4
+      cpu_target_percent: 70
+    sla_file: contracts/slas/fulfillment-sla.yaml
+    domains:
+      - docs/ddd/fulfillment
+      - contracts/slas/fulfillment-sla.yaml
+    kafka:
+      consumer_groups:
+        - name: fulfillment-gateway
+          topic: chakra.orders.confirmed
+      dead_letter_topic: chakra.fulfillment.dlq
+
   - name: api-gateway
     language: kong
     port: 8000
@@ -126,4 +154,8 @@ team_context_map:
     - ai-agents
     - tooling
     - contracts/slas/platform-sla.yaml
+    - contracts/slas/fulfillment-sla.yaml
+    - services/fulfillment-gateway
+    - docs/ddd/fulfillment
+    - infrastructure/helm/charts/fulfillment-gateway
     - .github
