@@ -1,0 +1,162 @@
+site_name: Chakra Commerce — Enterprise Modernization
+site_description: >
+  A reference architecture for modernizing enterprise monoliths to cloud-native
+  microservices — where humans provide domain knowledge and AI agents implement.
+site_url: https://naren-chakraview.github.io/chakraview-enterprise-modernization/
+repo_name: naren-chakraview/chakraview-enterprise-modernization
+repo_url: https://github.com/naren-chakraview/chakraview-enterprise-modernization
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  logo: assets/logo.svg
+  favicon: assets/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - announce.dismiss
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      title: On this page
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search:
+      lang: en
+  - tags
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/naren-chakraview
+  generator: false
+  analytics:
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/thumb-up-outline
+          name: Yes
+          data: 1
+          note: Thanks for your feedback!
+        - icon: material/thumb-down-outline
+          name: No
+          data: 0
+          note: Thanks — we use this to improve the docs.
+
+nav:
+  - Home: index.md
+  - Architecture:
+    - architecture/overview.md
+    - Principles: architecture/principles.md
+    - Human-AI Model: architecture/human-ai-model.md
+    - Agent Personas: architecture/agent-personas.md
+    - Glossary: architecture/glossary.md
+    - Diagrams:
+      - System Context: architecture/diagrams/system-context.md
+      - Container View: architecture/diagrams/container.md
+      - SLA Measurement Pipeline: architecture/diagrams/sla-measurement-flow.md
+      - Choreography Flow: architecture/diagrams/sequence-choreography.md
+  - Patterns:
+    - patterns/index.md
+    - Migration Patterns:
+      - Strangler Fig: adrs/ADR-0003-strangler-fig-migration.md
+      - Leave and Layer: adrs/ADR-0011-leave-and-layer-warehouse.md
+    - Data Patterns:
+      - Event Sourcing: adrs/ADR-0006-event-sourcing-orders.md
+      - CQRS: adrs/ADR-0007-cqrs-inventory.md
+      - Database per Service: adrs/ADR-0005-db-per-service.md
+    - Integration Patterns:
+      - Kafka Event Bus: adrs/ADR-0004-kafka-event-bus.md
+      - Choreography vs Orchestration: adrs/ADR-0015-choreography-events.md
+    - Resilience Patterns:
+      - Circuit Breaker: adrs/ADR-0012-circuit-breaker.md
+      - Bulkhead Isolation: adrs/ADR-0013-bulkhead-isolation.md
+      - Sidecar Mesh: adrs/ADR-0014-sidecar-mesh.md
+  - Domain Model:
+    - Bounded Contexts: ddd/bounded-contexts.md
+    - Orders Domain: ddd/orders/domain-model.md
+  - Contracts:
+    - contracts/index.md
+  - Migration:
+    - Strategy: migration/strategy.md
+    - Warehouse (Leave & Layer): migration/warehouse-leave-and-layer.md
+  - Observability:
+    - observability/index.md
+  - AI Agents:
+    - ai-agents/index.md
+    - Agent Personas: architecture/agent-personas.md
+    - Compliance Review: adrs/ADR-0010-ai-agent-dev-model.md
+  - ADRs:
+    - adrs/README.md
+    - ADR-0001 Contract-First: adrs/ADR-0001-contract-first-development.md
+    - ADR-0002 SLOs as Code: adrs/ADR-0002-slo-as-code.md
+    - ADR-0003 Strangler Fig: adrs/ADR-0003-strangler-fig-migration.md
+    - ADR-0004 Kafka: adrs/ADR-0004-kafka-event-bus.md
+    - ADR-0005 DB per Service: adrs/ADR-0005-db-per-service.md
+    - ADR-0006 Event Sourcing: adrs/ADR-0006-event-sourcing-orders.md
+    - ADR-0007 CQRS: adrs/ADR-0007-cqrs-inventory.md
+    - ADR-0008 OpenTelemetry: adrs/ADR-0008-opentelemetry.md
+    - ADR-0009 Helm GitOps: adrs/ADR-0009-helm-gitops.md
+    - ADR-0010 AI Agent Model: adrs/ADR-0010-ai-agent-dev-model.md
+    - ADR-0011 Leave and Layer: adrs/ADR-0011-leave-and-layer-warehouse.md
+    - ADR-0012 Circuit Breaker: adrs/ADR-0012-circuit-breaker.md
+    - ADR-0013 Bulkhead: adrs/ADR-0013-bulkhead-isolation.md
+    - ADR-0014 Sidecar: adrs/ADR-0014-sidecar-mesh.md
+    - ADR-0015 Choreography: adrs/ADR-0015-choreography-events.md
+  - Runbooks:
+    - SLA Breach Response: runbooks/sla-breach-response.md
