@@ -20,9 +20,9 @@ Service Level Agreements are not wiki pages or slide decks. They are versioned Y
 
 ---
 
-## 3. Contract-First Implementation
+## 3. Implementation Follows Contract Review
 
-No service, pipeline, or infrastructure component is built without a contract that defines what it must do. The contracts in `contracts/` — SLA targets, domain invariants, event schemas — are complete and reviewed before any implementation begins. A line of implementation code without a traceable contract is a liability, not a feature.
+Contracts are reviewed and accepted before the first line of implementation begins. A partial contract — one still under discussion or missing invariants — is not a valid input to an implementation task. Parallel contract-and-implementation PRs couple two uncertainties; sequential review creates a clean separation between what the system must do and how it does it.
 
 *How this was operationalised in this project: [How This Was Built](../how-this-was-built.md)*
 

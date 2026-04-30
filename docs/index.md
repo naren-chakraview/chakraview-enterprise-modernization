@@ -83,7 +83,7 @@ The Warehouse Management System runs in parallel throughout — never modified, 
 
 ---
 
-## The Modernisation Challenge
+## The Modernization Challenge
 
 Chakra Commerce represents a class of enterprise problem found in nearly every organisation that built software between 2000 and 2015: a monolith that was the right choice at the time, now limiting the team's ability to move independently, measure reliability, or scale specific workloads.
 
