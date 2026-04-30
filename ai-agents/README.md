@@ -1,3 +1,6 @@
+> **Note:** These are the Chakra Commerce-specific task specs used to build this project.
+> Generic, reusable templates for all task types live in [chakraview-ai-dev-model/templates](https://github.com/naren-chakraview/chakraview-ai-dev-model/tree/main/templates).
+
 # AI Agent Framework
 
 Six personas participate in this workflow. This directory holds the task specifications, context documents, and compliance review artifacts for all of them. Full persona definitions and the complete workflow: [`docs/architecture/agent-personas.md`](../docs/architecture/agent-personas.md).
