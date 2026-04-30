@@ -23,7 +23,7 @@ This directory contains all ADRs for the Chakra Commerce modernization. ADRs fol
 | [ADR-0007](ADR-0007-cqrs-inventory.md) | CQRS for the Inventory Domain | Accepted |
 | [ADR-0008](ADR-0008-opentelemetry.md) | OpenTelemetry as the Instrumentation Standard | Accepted |
 | [ADR-0009](ADR-0009-helm-gitops.md) | Helm + ArgoCD for GitOps Delivery | Accepted |
-| [ADR-0010](ADR-0010-ai-agent-dev-model.md) | AI Agents as the Implementation Model | Accepted |
+| ADR-0010 | AI Agents as the Implementation Model | Extracted — see [chakraview-ai-dev-model](https://github.com/naren-chakraview/chakraview-ai-dev-model) |
 | [ADR-0011](ADR-0011-leave-and-layer-warehouse.md) | Leave-and-Layer Pattern for Warehouse Integration | Accepted |
 | [ADR-0012](ADR-0012-circuit-breaker.md) | Circuit Breaker for External Dependency Calls | Accepted |
 | [ADR-0013](ADR-0013-bulkhead-isolation.md) | Bulkhead Isolation | Accepted |

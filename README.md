@@ -98,7 +98,7 @@ observability/      SLO definitions, burn rate alerts, Grafana dashboards, OTEL 
 | The business rules that can never be violated | [`contracts/domain-invariants/`](contracts/domain-invariants/) |
 | Why key architecture decisions were made | [`docs/adrs/`](docs/adrs/) |
 | How the monolith is being dismantled | [`docs/migration/strategy.md`](docs/migration/strategy.md) |
-| How AI agents are used in this workflow | [`docs/architecture/human-ai-model.md`](docs/architecture/human-ai-model.md) |
+| How this project was built with AI agents | [`docs/how-this-was-built.md`](docs/how-this-was-built.md) |
 | What an agent task looks like | [`ai-agents/tasks/agent/`](ai-agents/tasks/agent/) |
 | What can be scripted vs. needs an agent | [`ai-agents/README.md`](ai-agents/README.md) |
 | How services are structured | [`services/README.md`](services/README.md) |
