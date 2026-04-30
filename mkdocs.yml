@@ -103,8 +103,6 @@ nav:
   - Architecture:
     - architecture/overview.md
     - Principles: architecture/principles.md
-    - Human-AI Model: architecture/human-ai-model.md
-    - Agent Personas: architecture/agent-personas.md
     - Glossary: architecture/glossary.md
     - Diagrams:
       - System Context: architecture/diagrams/system-context.md
@@ -137,10 +135,6 @@ nav:
     - Warehouse (Leave & Layer): migration/warehouse-leave-and-layer.md
   - Observability:
     - observability/index.md
-  - AI Agents:
-    - ai-agents/index.md
-    - Agent Personas: architecture/agent-personas.md
-    - Compliance Review: adrs/ADR-0010-ai-agent-dev-model.md
   - ADRs:
     - adrs/README.md
     - ADR-0001 Contract-First: adrs/ADR-0001-contract-first-development.md
@@ -152,7 +146,6 @@ nav:
     - ADR-0007 CQRS: adrs/ADR-0007-cqrs-inventory.md
     - ADR-0008 OpenTelemetry: adrs/ADR-0008-opentelemetry.md
     - ADR-0009 Helm GitOps: adrs/ADR-0009-helm-gitops.md
-    - ADR-0010 AI Agent Model: adrs/ADR-0010-ai-agent-dev-model.md
     - ADR-0011 Leave and Layer: adrs/ADR-0011-leave-and-layer-warehouse.md
     - ADR-0012 Circuit Breaker: adrs/ADR-0012-circuit-breaker.md
     - ADR-0013 Bulkhead: adrs/ADR-0013-bulkhead-isolation.md
@@ -160,3 +153,4 @@ nav:
     - ADR-0015 Choreography: adrs/ADR-0015-choreography-events.md
   - Runbooks:
     - SLA Breach Response: runbooks/sla-breach-response.md
+  - How This Was Built: how-this-was-built.md
