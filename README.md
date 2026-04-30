@@ -59,7 +59,6 @@ Full strategy: [`docs/migration/strategy.md`](docs/migration/strategy.md)
 | [ADR-0002](docs/adrs/ADR-0002-slo-as-code.md) | SLOs as versioned YAML | SLA targets are code, not wiki pages |
 | [ADR-0003](docs/adrs/ADR-0003-strangler-fig-migration.md) | Strangler fig migration | No big-bang rewrite; each phase is independently reversible |
 | [ADR-0006](docs/adrs/ADR-0006-event-sourcing-orders.md) | Event sourcing for Orders | Full audit trail; saga compensation requires event replay |
-| [ADR-0010](docs/adrs/ADR-0010-ai-agent-dev-model.md) | AI agents as implementers | Agents are faster; humans focus on domain correctness |
 
 Full ADR index: [`docs/adrs/README.md`](docs/adrs/README.md)
 
@@ -124,22 +123,8 @@ observability/      SLO definitions, burn rate alerts, Grafana dashboards, OTEL 
 
 ---
 
-## The Human–AI Development Model
+## How This Was Built
 
-In this architecture, the engineering team's primary output is **contracts**: precise, versioned specifications of business intent. AI agents consume those contracts to produce implementation artifacts.
+This project was built using the [Chakraview AI Dev Model](https://github.com/naren-chakraview/chakraview-ai-dev-model) — a 6-persona workflow where humans author contracts and agents implement from them.
 
-```
-Human authors          AI agents build
-─────────────          ────────────────
-contracts/slas/    →   observability/slos/ + alerts/
-contracts/schemas/ →   services/*/src/domain/events/
-contracts/rules/   →   services/*/src/domain/ (aggregates, guards)
-docs/adrs/         →   services/ + infrastructure/ (guided by decisions)
-ai-agents/tasks/   →   everything in services/, infrastructure/, .github/
-tooling/*.yaml     →   tooling/*.py / *.sh (scripts that run forever)
-```
-
-This is not automation for its own sake. It is a deliberate separation: humans hold accountability for correctness; agents handle volume and consistency.
-
-Full explanation: [`docs/architecture/human-ai-model.md`](docs/architecture/human-ai-model.md)
-Persona definitions and complete workflow: [`docs/architecture/agent-personas.md`](docs/architecture/agent-personas.md)
+[How This Was Built →](docs/how-this-was-built.md)

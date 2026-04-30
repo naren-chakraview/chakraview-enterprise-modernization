@@ -20,11 +20,11 @@ Service Level Agreements are not wiki pages or slide decks. They are versioned Y
 
 ---
 
-## 3. Humans Define Correctness; Agents Ensure Consistency
+## 3. Contract-First Implementation
 
-Humans author the contracts that define what "correct" means. AI agents implement from those contracts. The separation is explicit: `contracts/` is human-only; `services/`, `infrastructure/`, and `observability/alerts/` are agent-built. This division prevents drift and maintains accountability.
+No service, pipeline, or infrastructure component is built without a contract that defines what it must do. The contracts in `contracts/` — SLA targets, domain invariants, event schemas — are complete and reviewed before any implementation begins. A line of implementation code without a traceable contract is a liability, not a feature.
 
-*See: [ADR-0010](../adrs/ADR-0010-ai-agent-dev-model.md)*
+*How this was operationalised in this project: [How This Was Built](../how-this-was-built.md)*
 
 ---
 

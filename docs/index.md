@@ -45,13 +45,13 @@ This reference architecture inverts both problems.
 
     [:octicons-arrow-right-24: Browse ADRs](adrs/README.md)
 
--   :material-robot-outline:{ .lg .middle } __6 AI Agent Personas__
+-   :material-hammer-wrench:{ .lg .middle } __How This Was Built__
 
     ---
 
-    Human Domain Expert, Documentation Agent, Script Authoring Agent, Script Executor, Implementation Agent, and Architectural Compliance Agent — each with explicit inputs, outputs, and constraints.
+    All 6 AI dev model personas — Human Domain Expert, Documentation Agent, Script Authoring Agent, Script Executor, Implementation Agent, and Compliance Agent — contributed to this project. See the full breakdown.
 
-    [:octicons-arrow-right-24: Understand the AI Model](ai-agents/index.md)
+    [:octicons-arrow-right-24: How This Was Built](how-this-was-built.md)
 
 -   :material-chart-line:{ .lg .middle } __SLA → Alert in one pipeline__
 
@@ -83,22 +83,18 @@ The Warehouse Management System runs in parallel throughout — never modified, 
 
 ---
 
-## The Human–AI Boundary
+## The Modernisation Challenge
 
-```
-Human authors                    AI agents build
-─────────────────────────        ─────────────────────────────────
-contracts/slas/*.yaml        →   observability/slos/*.yaml
-contracts/slas/*.yaml        →   observability/alerts/*-burnrate.yaml
-contracts/event-schemas/     →   services/*/src/domain/events/*.ts
-contracts/domain-invariants/ →   services/*/src/domain/ (aggregates, guards)
-docs/adrs/                   →   services/ + infrastructure/
-ai-agents/tasks/agent/       →   everything in services/, infrastructure/
-```
+Chakra Commerce represents a class of enterprise problem found in nearly every organisation that built software between 2000 and 2015: a monolith that was the right choice at the time, now limiting the team's ability to move independently, measure reliability, or scale specific workloads.
 
-This is not automation for its own sake. It is a deliberate separation: **humans hold accountability for correctness; agents handle volume and consistency.**
+This reference architecture addresses four specific challenges:
 
-[:octicons-arrow-right-24: Read the Human-AI Model](architecture/human-ai-model.md)
+- **Extraction without downtime**: The strangler fig pattern lets each bounded context go live independently, with the monolith continuing to serve traffic throughout.
+- **SLA accountability during migration**: SLA targets are defined before extraction begins. Every migration phase has observable go/no-go criteria tied to those SLAs.
+- **Data consistency across split storage**: CDC pipelines and the event bus replace the shared database as the integration mechanism between newly extracted services.
+- **Legacy system integration**: The Leave-and-Layer pattern keeps the on-premises Warehouse Management System untouched while the rest of the architecture modernises around it.
+
+[:octicons-arrow-right-24: Read the full migration strategy](migration/strategy.md)
 
 ---
 
