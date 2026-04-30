@@ -3,7 +3,7 @@
 
 # AI Agent Framework
 
-Six personas participate in this workflow. This directory holds the task specifications, context documents, and compliance review artifacts for all of them. Full persona definitions and the complete workflow: [`docs/architecture/agent-personas.md`](../docs/architecture/agent-personas.md).
+Six personas participate in this workflow. This directory holds the task specifications, context documents, and compliance review artifacts for all of them. Full persona definitions and the complete workflow: [chakraview-ai-dev-model/docs/personas](https://github.com/naren-chakraview/chakraview-ai-dev-model/tree/main/docs/personas).
 
 ```
 ai-agents/

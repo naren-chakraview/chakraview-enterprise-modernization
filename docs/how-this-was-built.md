@@ -56,7 +56,7 @@ No alert was written by hand. No alert can exist without a human-authored SLA ta
 
 **Step 2 — Persona 2 (Documentation Agent)** expands the DDD stub into `docs/ddd/orders/domain-model.md` and `docs/ddd/orders/state-machine.md`. Human review gate: do the models faithfully express the invariants?
 
-**Step 3 — Persona 5 (Implementation Agent)** reads all 9 input files listed in [`ai-agents/tasks/agent/implement-orders-service.md`](https://github.com/naren-chakraview/chakraview-enterprise-modernization/blob/main/ai-agents/tasks/agent/implement-orders-service.md) and produces the TypeScript domain, application, and infrastructure layers plus domain tests.
+**Step 3 — Persona 5 (Implementation Agent)** reads all input files listed in [`ai-agents/tasks/agent/implement-orders-service.md`](https://github.com/naren-chakraview/chakraview-enterprise-modernization/blob/main/ai-agents/tasks/agent/implement-orders-service.md) and produces the TypeScript domain, application, and infrastructure layers plus domain tests.
 
 **Step 4 — Persona 6 (Compliance Agent)** runs the Phase 5 checklist against the produced code. See [`ai-agents/tasks/agent/architectural-compliance-review.md`](https://github.com/naren-chakraview/chakraview-enterprise-modernization/blob/main/ai-agents/tasks/agent/architectural-compliance-review.md) for the 15-item checklist. Output committed to `ai-agents/reviews/`.
 
@@ -72,7 +72,7 @@ No alert was written by hand. No alert can exist without a human-authored SLA ta
 
 **Step 3 — Human review gate:** does the ADR correctly capture the decision? Are the alternatives honestly rejected? Do the consequences include negatives?
 
-This project has 15 ADRs produced this way. Browse them at [`docs/adrs/`](adrs/README.md).
+This project has 14 ADRs produced this way. Browse them at [`docs/adrs/`](adrs/README.md).
 
 ---
 
