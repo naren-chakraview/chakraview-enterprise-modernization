@@ -120,7 +120,7 @@ observability/      SLO definitions, burn rate alerts, Grafana dashboards, OTEL 
 | How services are structured | [`services/README.md`](services/README.md) |
 | How to respond to an SLA breach | [`docs/runbooks/sla-breach-response.md`](docs/runbooks/sla-breach-response.md) |
 | Phase 2: Semantic unification (entity dedup, RDF, SPARQL) | [`docs/case-study/phase-2-semantic-unification/`](docs/case-study/phase-2-semantic-unification/) |
-| Semantic medallion architecture patterns | [chakraview-data-engineering-patterns](https://github.com/naren-chakraview/chakraview-data-engineering-patterns/tree/main/docs/patterns/semantic-medallion.md) |
+| Semantic medallion architecture patterns | [Data Engineering Patterns](https://naren-chakraview.github.io/data-engineering-patterns/patterns/semantic-medallion/) |
 
 ---
 
