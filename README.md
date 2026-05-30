@@ -49,6 +49,22 @@ C4Context
 
 Full strategy: [`docs/migration/strategy.md`](docs/migration/strategy.md)
 
+### Phase 2 Enhancement: Semantic Unification Layer 🎯
+
+After Phase 1 establishes traditional dimensional modeling, **Phase 2 adds a semantic knowledge graph** for cross-source entity unification and ontology-driven analytics.
+
+| Capability | Benefit |
+|---|---|
+| **Single Source of Truth (IRIs)** | Customer record in Salesforce + Stripe + Postgres = one IRI across all sources |
+| **Semantic Reasoning** | Define "at-risk customer" once in ontology; query applies everywhere |
+| **Data Unification without Migration** | Layer semantic medallion on top of existing dimensional model; BI tools unaffected |
+| **Entity Resolution at Ingest** | Debezium + IRI Minter = stable identities from day 1 |
+
+📚 **Case Study**: [Phase 2 Semantic Unification](docs/case-study/phase-2-semantic-unification/) — E-commerce churn analysis using RDF knowledge graphs
+- **Scenario**: Correlate purchase history (Shopify) + support tickets (Salesforce) + payment failures (Stripe)
+- **Solution**: Semantic CDC (IRI minting) → Batch Lakehouse (RDF) → Federated Query (SPARQL)
+- **Outcome**: Single ontology, unified queries, no schema negotiation
+
 ---
 
 ## Key Architectural Decisions
@@ -103,6 +119,8 @@ observability/      SLO definitions, burn rate alerts, Grafana dashboards, OTEL 
 | What can be scripted vs. needs an agent | [`ai-agents/README.md`](ai-agents/README.md) |
 | How services are structured | [`services/README.md`](services/README.md) |
 | How to respond to an SLA breach | [`docs/runbooks/sla-breach-response.md`](docs/runbooks/sla-breach-response.md) |
+| Phase 2: Semantic unification (entity dedup, RDF, SPARQL) | [`docs/case-study/phase-2-semantic-unification/`](docs/case-study/phase-2-semantic-unification/) |
+| Semantic medallion architecture patterns | [chakraview-data-engineering-patterns](https://github.com/naren-chakraview/chakraview-data-engineering-patterns/tree/main/docs/patterns/semantic-medallion.md) |
 
 ---
 
