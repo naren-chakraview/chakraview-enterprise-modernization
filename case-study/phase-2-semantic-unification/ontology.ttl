@@ -1,0 +1,402 @@
+@prefix : <https://trendcart.com/ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# =====================================================================
+# CLASS DEFINITIONS
+# =====================================================================
+
+:Customer a owl:Class ;
+    rdfs:label "Customer"@en ;
+    rdfs:comment "A TrendCart customer engaged with the e-commerce platform"@en ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:Order a owl:Class ;
+    rdfs:label "Order"@en ;
+    rdfs:comment "A purchase order placed by a customer"@en ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:SupportTicket a owl:Class ;
+    rdfs:label "Support Ticket"@en ;
+    rdfs:comment "A customer support interaction or complaint"@en ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:Payment a owl:Class ;
+    rdfs:label "Payment"@en ;
+    rdfs:comment "A payment transaction"@en ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:PaymentFailure a owl:Class ;
+    rdfs:subClassOf :Payment ;
+    rdfs:label "Payment Failure"@en ;
+    rdfs:comment "A declined or failed payment transaction"@en ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:Event a owl:Class ;
+    rdfs:label "Event"@en ;
+    rdfs:comment "A behavioral event (page view, add-to-cart, etc.)"@en ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:CustomerTier a owl:Class ;
+    rdfs:label "Customer Tier"@en ;
+    rdfs:comment "A customer loyalty or engagement tier"@en ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:OrderStatus a owl:Class ;
+    rdfs:label "Order Status"@en ;
+    rdfs:comment "The status of an order"@en ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:TicketStatus a owl:Class ;
+    rdfs:label "Ticket Status"@en ;
+    rdfs:comment "The status of a support ticket"@en ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:PaymentStatus a owl:Class ;
+    rdfs:label "Payment Status"@en ;
+    rdfs:comment "The status of a payment transaction"@en ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+# =====================================================================
+# NAMED INDIVIDUALS (Enumerations)
+# =====================================================================
+
+:Active a :OrderStatus ;
+    rdfs:label "Active"@en ;
+    skos:definition "Customer is actively engaged"@en .
+
+:Inactive a :OrderStatus ;
+    rdfs:label "Inactive"@en ;
+    skos:definition "Customer has not engaged in last 90 days"@en .
+
+:Gold a :CustomerTier ;
+    rdfs:label "Gold"@en ;
+    skos:definition "High-value customer tier"@en .
+
+:Silver a :CustomerTier ;
+    rdfs:label "Silver"@en ;
+    skos:definition "Mid-value customer tier"@en .
+
+:Bronze a :CustomerTier ;
+    rdfs:label "Bronze"@en ;
+    skos:definition "Low-value or new customer tier"@en .
+
+:Completed a :OrderStatus ;
+    rdfs:label "Completed"@en ;
+    skos:definition "Order has been fulfilled"@en .
+
+:Pending a :OrderStatus ;
+    rdfs:label "Pending"@en ;
+    skos:definition "Order awaiting fulfillment"@en .
+
+:Cancelled a :OrderStatus ;
+    rdfs:label "Cancelled"@en ;
+    skos:definition "Order was cancelled"@en .
+
+:Returned a :OrderStatus ;
+    rdfs:label "Returned"@en ;
+    skos:definition "Order items were returned"@en .
+
+:Open a :TicketStatus ;
+    rdfs:label "Open"@en ;
+    skos:definition "Support ticket is unresolved"@en .
+
+:InProgress a :TicketStatus ;
+    rdfs:label "In Progress"@en ;
+    skos:definition "Support ticket is being worked on"@en .
+
+:Resolved a :TicketStatus ;
+    rdfs:label "Resolved"@en ;
+    skos:definition "Support ticket has been resolved"@en .
+
+:Succeeded a :PaymentStatus ;
+    rdfs:label "Succeeded"@en ;
+    skos:definition "Payment was successful"@en .
+
+:Failed a :PaymentStatus ;
+    rdfs:label "Failed"@en ;
+    skos:definition "Payment failed"@en .
+
+:Declined a :PaymentStatus ;
+    rdfs:label "Declined"@en ;
+    skos:definition "Payment was declined by issuer"@en .
+
+# =====================================================================
+# OBJECT PROPERTIES (Relationships)
+# =====================================================================
+
+:hasOrder a owl:ObjectProperty ;
+    rdfs:label "has order"@en ;
+    rdfs:comment "A customer has placed an order"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range :Order ;
+    owl:inverseOf :placedBy ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:placedBy a owl:ObjectProperty ;
+    rdfs:label "placed by"@en ;
+    rdfs:comment "An order was placed by a customer"@en ;
+    rdfs:domain :Order ;
+    rdfs:range :Customer ;
+    owl:inverseOf :hasOrder ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:hasSupportTicket a owl:ObjectProperty ;
+    rdfs:label "has support ticket"@en ;
+    rdfs:comment "A customer has opened a support ticket"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range :SupportTicket ;
+    owl:inverseOf :filedBy ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:filedBy a owl:ObjectProperty ;
+    rdfs:label "filed by"@en ;
+    rdfs:comment "A support ticket was filed by a customer"@en ;
+    rdfs:domain :SupportTicket ;
+    rdfs:range :Customer ;
+    owl:inverseOf :hasSupportTicket ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:hasFailedPayment a owl:ObjectProperty ;
+    rdfs:label "has failed payment"@en ;
+    rdfs:comment "A customer has experienced a payment failure"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range :PaymentFailure ;
+    owl:inverseOf :failedFor ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:failedFor a owl:ObjectProperty ;
+    rdfs:label "failed for"@en ;
+    rdfs:comment "A payment failure occurred for a customer"@en ;
+    rdfs:domain :PaymentFailure ;
+    rdfs:range :Customer ;
+    owl:inverseOf :hasFailedPayment ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:hasPayment a owl:ObjectProperty ;
+    rdfs:label "has payment"@en ;
+    rdfs:comment "An order has an associated payment"@en ;
+    rdfs:domain :Order ;
+    rdfs:range :Payment ;
+    owl:inverseOf :paymentFor ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:paymentFor a owl:ObjectProperty ;
+    rdfs:label "payment for"@en ;
+    rdfs:comment "A payment is associated with an order"@en ;
+    rdfs:domain :Payment ;
+    rdfs:range :Order ;
+    owl:inverseOf :hasPayment ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:inTier a owl:ObjectProperty ;
+    rdfs:label "in tier"@en ;
+    rdfs:comment "A customer belongs to a loyalty tier"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range :CustomerTier ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:hasStatus a owl:ObjectProperty ;
+    rdfs:label "has status"@en ;
+    rdfs:comment "An entity (Order, Ticket, Payment) has a status"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (:Order :SupportTicket :Payment) ] ;
+    rdfs:range [ a owl:Class ; owl:unionOf (:OrderStatus :TicketStatus :PaymentStatus) ] ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:customerStatus a owl:ObjectProperty ;
+    rdfs:label "customer status"@en ;
+    rdfs:comment "The engagement status of a customer (Active/Inactive)"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range [ a owl:Class ; owl:unionOf (:Active :Inactive) ] ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:generatedEvent a owl:ObjectProperty ;
+    rdfs:label "generated event"@en ;
+    rdfs:comment "A customer generated a behavioral event"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range :Event ;
+    owl:inverseOf :generatedBy ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:generatedBy a owl:ObjectProperty ;
+    rdfs:label "generated by"@en ;
+    rdfs:comment "An event was generated by a customer"@en ;
+    rdfs:domain :Event ;
+    rdfs:range :Customer ;
+    owl:inverseOf :generatedEvent ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+# =====================================================================
+# DATATYPE PROPERTIES (Attributes)
+# =====================================================================
+
+:hasEmail a owl:DatatypeProperty ;
+    rdfs:label "has email"@en ;
+    rdfs:comment "Customer email address"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:hasPhone a owl:DatatypeProperty ;
+    rdfs:label "has phone"@en ;
+    rdfs:comment "Customer phone number"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:hasName a owl:DatatypeProperty ;
+    rdfs:label "has name"@en ;
+    rdfs:comment "Customer full name"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:joinDate a owl:DatatypeProperty ;
+    rdfs:label "join date"@en ;
+    rdfs:comment "The date a customer joined"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range xsd:date ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:lastActiveDate a owl:DatatypeProperty ;
+    rdfs:label "last active date"@en ;
+    rdfs:comment "The most recent date a customer engaged"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range xsd:date ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:orderDate a owl:DatatypeProperty ;
+    rdfs:label "order date"@en ;
+    rdfs:comment "The date an order was placed"@en ;
+    rdfs:domain :Order ;
+    rdfs:range xsd:date ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:amount a owl:DatatypeProperty ;
+    rdfs:label "amount"@en ;
+    rdfs:comment "Monetary amount in USD"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (:Order :Payment) ] ;
+    rdfs:range xsd:decimal ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:ticketCreatedDate a owl:DatatypeProperty ;
+    rdfs:label "ticket created date"@en ;
+    rdfs:comment "Date a support ticket was created"@en ;
+    rdfs:domain :SupportTicket ;
+    rdfs:range xsd:date ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:ticketResolvedDate a owl:DatatypeProperty ;
+    rdfs:label "ticket resolved date"@en ;
+    rdfs:comment "Date a support ticket was resolved"@en ;
+    rdfs:domain :SupportTicket ;
+    rdfs:range xsd:date ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:sentimentScore a owl:DatatypeProperty ;
+    rdfs:label "sentiment score"@en ;
+    rdfs:comment "NLP-derived sentiment of support ticket (0-1 scale)"@en ;
+    rdfs:domain :SupportTicket ;
+    rdfs:range [ a owl:Datatype ; owl:onDatatype xsd:float ;
+                 owl:withRestrictions ( [ xsd:minInclusive "0.0"^^xsd:float ]
+                                         [ xsd:maxInclusive "1.0"^^xsd:float ] ) ] ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:resolutionSLAMet a owl:DatatypeProperty ;
+    rdfs:label "resolution SLA met"@en ;
+    rdfs:comment "Whether ticket resolution met SLA"@en ;
+    rdfs:domain :SupportTicket ;
+    rdfs:range xsd:boolean ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:failureReason a owl:DatatypeProperty ;
+    rdfs:label "failure reason"@en ;
+    rdfs:comment "Reason for payment failure (e.g., 'card_declined', 'insufficient_funds')"@en ;
+    rdfs:domain :PaymentFailure ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:paymentDate a owl:DatatypeProperty ;
+    rdfs:label "payment date"@en ;
+    rdfs:comment "Date a payment transaction occurred"@en ;
+    rdfs:domain :Payment ;
+    rdfs:range xsd:date ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:engagementScore a owl:DatatypeProperty ;
+    rdfs:label "engagement score"@en ;
+    rdfs:comment "Customer behavioral engagement score (0-100)"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range [ a owl:Datatype ; owl:onDatatype xsd:integer ;
+                 owl:withRestrictions ( [ xsd:minInclusive "0"^^xsd:integer ]
+                                         [ xsd:maxInclusive "100"^^xsd:integer ] ) ] ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:eventType a owl:DatatypeProperty ;
+    rdfs:label "event type"@en ;
+    rdfs:comment "Type of behavioral event (page_view, add_to_cart, checkout, etc.)"@en ;
+    rdfs:domain :Event ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:eventTimestamp a owl:DatatypeProperty ;
+    rdfs:label "event timestamp"@en ;
+    rdfs:comment "ISO 8601 timestamp of event occurrence"@en ;
+    rdfs:domain :Event ;
+    rdfs:range xsd:dateTime ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:sourceSystem a owl:DatatypeProperty ;
+    rdfs:label "source system"@en ;
+    rdfs:comment "Origin system for this data (shopify, stripe, salesforce, etc.)"@en ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (:Customer :Order :Payment :SupportTicket) ] ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+:deduplicationConfidence a owl:DatatypeProperty ;
+    rdfs:label "deduplication confidence"@en ;
+    rdfs:comment "Confidence score of entity match (0-1 scale)"@en ;
+    rdfs:domain :Customer ;
+    rdfs:range [ a owl:Datatype ; owl:onDatatype xsd:float ;
+                 owl:withRestrictions ( [ xsd:minInclusive "0.0"^^xsd:float ]
+                                         [ xsd:maxInclusive "1.0"^^xsd:float ] ) ] ;
+    rdfs:isDefinedBy <https://trendcart.com/ontology> .
+
+# =====================================================================
+# RULES / INFERENCES
+# =====================================================================
+
+# Rule: A customer with 3+ unresolved support tickets is high-maintenance
+# Used in SPARQL FILTER clauses, not formal SWRL rules
+
+# Rule: A customer is at churn risk if:
+#   - Has 3+ open support tickets AND
+#   - Has 1+ failed payment in past 90 days
+
+# Rule: A customer is valuable if:
+#   - In Gold tier AND
+#   - Last active < 30 days ago (recent engagement)
+
+# =====================================================================
+# EXAMPLE INSTANCE (for documentation)
+# =====================================================================
+
+# Example Customer:
+# <https://trendcart.com/customer/c001>
+#   a :Customer ;
+#   :hasEmail "alice@example.com" ;
+#   :hasPhone "+1-555-0123" ;
+#   :hasName "Alice Johnson" ;
+#   :customerStatus :Active ;
+#   :inTier :Gold ;
+#   :joinDate "2023-01-15"^^xsd:date ;
+#   :lastActiveDate "2026-05-28"^^xsd:date ;
+#   :engagementScore 87 ;
+#   :deduplicationConfidence 0.96 ;
+#   :sourceSystem "shopify" ;
+#   :hasOrder <https://trendcart.com/order/o123> ;
+#   :hasSupportTicket <https://trendcart.com/ticket/t456> ;
+#   :hasFailedPayment <https://trendcart.com/payment/p789> .

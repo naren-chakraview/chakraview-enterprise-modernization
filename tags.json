@@ -1,0 +1,1 @@
+{"mappings": [{"item": {"url": "", "title": "Home"}, "tags": ["overview"]}, {"item": {"url": "contracts/", "title": "Contracts"}, "tags": ["contracts"]}, {"item": {"url": "observability/", "title": "Observability"}, "tags": ["observability", "slo"]}, {"item": {"url": "patterns/", "title": "Pattern Catalogue"}, "tags": ["patterns"]}]}
